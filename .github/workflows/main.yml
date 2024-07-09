@@ -1,0 +1,37 @@
+name: VPS Setup
+
+on: [push]
+
+jobs:
+  run-vps:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up environment
+        run: |
+          sudo apt update
+          sudo apt install -y openssh-server ngrok
+
+          # Thay đổi mật khẩu cho người dùng hiện tại
+          echo 'root:password' | sudo chpasswd
+
+          # Bắt đầu dịch vụ SSH
+          sudo service ssh start
+
+          # Thiết lập ngrok với mã thông báo của bạn
+          ngrok authtoken YOUR_NGROK_AUTH_TOKEN
+          ngrok tcp 22 --log=stdout > ngrok.log &
+
+          # Đợi ngrok khởi động và lấy URL
+          sleep 10
+          NGROK_URL=$(curl --silent http://127.0.0.1:4040/api/tunnels | grep -o "tcp://[0-9a-z]*\.ngrok\.io:[0-9]*")
+          echo "Ngrok URL: $NGROK_URL"
+
+          # Ghi URL vào một file để xem trong Actions log
+          echo $NGROK_URL > ngrok_url.txt
+
+      - name: Output ngrok URL
+        run: cat ngrok_url.txt
+        
