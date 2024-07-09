@@ -22,7 +22,7 @@ jobs:
       - name: Start AppHub Service and Configure
         run: |
           cd ./apphub-linux-amd64
-          ./apphub service start
+          sudo ./apphub service start
           ./apphub status
-          ./apps/gaganode/gaganode config set --token=habforamvfiyoccceac75d192a8a53f9
+          sudo ./apps/gaganode/gaganode config set --token=habforamvfiyoccceac75d192a8a53f9
           ./apphub restart
